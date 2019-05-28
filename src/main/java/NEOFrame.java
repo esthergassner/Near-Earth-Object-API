@@ -148,11 +148,9 @@ public class NEOFrame extends JFrame
 
         listHashMap.forEach((key, value) -> {
             List<NearEarthObject> daysList = listHashMap.get(key);
-            System.out.println(key + ":");
             for (NearEarthObject NEO : daysList)
             {
                 listModel.addElement(NEO);
-                System.out.println("\t" + NEO.getName());
             }
         });
         list.setModel(listModel);

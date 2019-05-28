@@ -16,7 +16,7 @@ public class NEOFrame extends JFrame
     private JButton go;
     private HashMap<String, List<NearEarthObject>> listHashMap;
     private JList list;
-    private Font defFont = new Font("Arial",Font.PLAIN,20);
+    private Font defFont = new Font("Arial",Font.PLAIN,30);
     private JPanel controlPanel;
     private JTextArea neoInfo;
     private NearEarthObject currentNEO;
@@ -91,7 +91,7 @@ public class NEOFrame extends JFrame
     private void setUpControlPanel()
     {
         controlPanel = new JPanel();
-        controlPanel.setBackground(new Color(0x81FE8B36, true));
+        controlPanel.setBackground(new Color(0x781D57C4, true));
         controlPanel.add(startDateLabel);
         controlPanel.add(startDateField);
         controlPanel.add(endDateLabel);
@@ -114,14 +114,14 @@ public class NEOFrame extends JFrame
                 return  this;  }
         };
         list.setCellRenderer(renderer);
-        list.setFont(new Font("Arial",Font.BOLD,18));
+        list.setFont(new Font("Arial",Font.BOLD,25));
         list.addListSelectionListener(e -> {
             currentNEO = (NearEarthObject) list.getSelectedValue();
             displayFurtherData();
         });
         JScrollPane listScroller = new JScrollPane(list);
-        listScroller.setBackground(new Color(0x78C4C309, true));
-        listScroller.setPreferredSize(new Dimension(500, getHeight()));
+        listScroller.setBackground(new Color(0x81AF67FE, true));
+        listScroller.setPreferredSize(new Dimension(800, getHeight()));
         TitledBorder border = new TitledBorder("Enter start and end dates to display NEOs below.");
         border.setTitleFont(defFont);
         border.setTitleJustification(TitledBorder.CENTER);
@@ -158,8 +158,13 @@ public class NEOFrame extends JFrame
 
     private void displayFurtherData()
     {
-        NearEarthObject.CloseApproachData cad = currentNEO.getClose_approach_data().get(0);
-        String closeApproachDate =   cad.getClose_approach_date_full();
+                NearEarthObject.CloseApproachData cad = currentNEO.getClose_approach_data().get(0);
+                String closeApproachDate;
+                if (cad.getClose_approach_date_full() == null)
+                {
+                    closeApproachDate = cad.getClose_approach_date();
+                }
+        else {closeApproachDate =   cad.getClose_approach_date_full();}
         String velocity = cad.getRelative_velocity().getMiles_per_hour();
         String missDistance = cad.getMiss_distance().getMiles();
 

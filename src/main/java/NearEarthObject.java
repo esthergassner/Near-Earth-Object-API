@@ -45,11 +45,12 @@ public class NearEarthObject
     class CloseApproachData
     {
         //fields
-        private String close_approach_date_full;
+        private String close_approach_date_full, close_approach_date;
         private Velocity relative_velocity;
         private MissDistance miss_distance;
 
         //methods
+        String getClose_approach_date() { return close_approach_date;}
         String getClose_approach_date_full() { return close_approach_date_full;}
         Velocity getRelative_velocity() { return relative_velocity;}
         MissDistance getMiss_distance()  { return miss_distance;}

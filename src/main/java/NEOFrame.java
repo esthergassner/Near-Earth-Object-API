@@ -204,6 +204,7 @@ public class NEOFrame extends JFrame
         String missDistance = cad.getMiss_distance().getMiles();
 
         diagramLinkButton.setVisible(true);
+        neoInfo.setForeground(Color.BLACK);
         neoInfo.setFont(new Font("Arial",Font.PLAIN,30));
         neoInfo.setText("Name: " + currentNEO.getName() + "\n" +
                 "Reference Id: " + currentNEO.getId() + "\n\n" +

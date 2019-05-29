@@ -108,7 +108,7 @@ public class NEOFrame extends JFrame
         diagramLinkButton.setFont(defFont);
         diagramLinkButton.setBackground(new Color(0x781D57C4, true));
         diagramLinkButton.setLocation(500, 800);
-
+        diagramLinkButton.setVisible(false);
         diagramLinkButton.addActionListener(e -> {
             try {
                 String orbitalDiagramLink = "https://ssd.jpl.nasa.gov/sbdb.cgi?sstr=" + currentNEO.getId() + ";old=0;orb=1;cov=0;log=0;cad=0#orb";
@@ -203,7 +203,7 @@ public class NEOFrame extends JFrame
         String velocity = cad.getRelative_velocity().getMiles_per_hour();
         String missDistance = cad.getMiss_distance().getMiles();
 
-        neoInfo.setForeground(Color.BLACK);
+        diagramLinkButton.setVisible(true);
         neoInfo.setFont(new Font("Arial",Font.PLAIN,30));
         neoInfo.setText("Name: " + currentNEO.getName() + "\n" +
                 "Reference Id: " + currentNEO.getId() + "\n\n" +

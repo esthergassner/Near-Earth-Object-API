@@ -1,3 +1,4 @@
+import java.net.URL;
 import java.util.List;
 
 public class NearEarthObject
@@ -5,6 +6,7 @@ public class NearEarthObject
     //fields
     private String id;
     private String name;
+    private URL nasa_jpl_url;
     private boolean is_potentially_hazardous_asteroid;
     private Diameter estimated_diameter;
     private List<CloseApproachData> close_approach_data;
@@ -15,6 +17,7 @@ public class NearEarthObject
         return id;
     }
     String getName() { return name; }
+    URL getNasa_jpl_url() {return nasa_jpl_url;}
     public void setName(String name) {this.name = name;}
     boolean isPotentiallyHazardous() { return is_potentially_hazardous_asteroid;}
     Diameter getEstimated_diameter() {return estimated_diameter;}

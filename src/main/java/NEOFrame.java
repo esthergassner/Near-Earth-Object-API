@@ -16,11 +16,12 @@ public class NEOFrame extends JFrame
     private JButton go;
     private HashMap<String, List<NearEarthObject>> listHashMap;
     private JList list;
-    private Font defFont = new Font("Arial",Font.PLAIN,30);
-    private JPanel controlPanel;
+    private Font defFont = new Font("Arial",Font.PLAIN,26);
+    private JPanel controlPanel, neoInfoPanel;
     private JTextArea neoInfo;
     private NearEarthObject currentNEO;
     private JSplitPane splitPane;
+    private JButton diagramLinkButton;
 
     private NEOFrame()
     {
@@ -34,8 +35,9 @@ public class NEOFrame extends JFrame
         root.setLayout(new BorderLayout());
 
         setUpDateFields();
-        setUpButton(client);
+        setUpGoButton(client);
         setUpControlPanel();
+        setUpLinkButton();
         setUpSplitPane();
 
         root.add(splitPane, BorderLayout.CENTER);
@@ -62,7 +64,7 @@ public class NEOFrame extends JFrame
         endDateField.setText(LocalDate.now().plusDays(1).toString());
     }
 
-    private void setUpButton(NasaClient client)
+    private void setUpGoButton(NasaClient client)
     {
         go = new JButton();
         go.setBackground(new Color(0x0EF9EF));
@@ -99,6 +101,25 @@ public class NEOFrame extends JFrame
         controlPanel.add(go);
     }
 
+    private void setUpLinkButton()
+    {
+        diagramLinkButton = new JButton("Link to Orbital Diagram");
+        diagramLinkButton.setSize(100, 50);
+        diagramLinkButton.setFont(defFont);
+        diagramLinkButton.setBackground(new Color(0x781D57C4, true));
+        diagramLinkButton.setLocation(500, 800);
+
+        diagramLinkButton.addActionListener(e -> {
+            try {
+                String orbitalDiagramLink = "https://ssd.jpl.nasa.gov/sbdb.cgi?sstr=" + currentNEO.getId() + ";old=0;orb=1;cov=0;log=0;cad=0#orb";
+                java.awt.Desktop.getDesktop().browse(java.net.URI.create(orbitalDiagramLink));
+            }
+            catch (java.io.IOException exc) {
+                System.out.println(exc.getMessage());
+            }
+        });
+    }
+
     private void setUpSplitPane()
     {
         //list scroll pane
@@ -111,17 +132,21 @@ public class NEOFrame extends JFrame
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 NearEarthObject neo = (NearEarthObject) value;
                 setText(neo.getName());
+                if (neo.isPotentiallyHazardous())
+                {
+                    setForeground(Color.RED);
+                }
                 return  this;  }
         };
         list.setCellRenderer(renderer);
         list.setFont(new Font("Arial",Font.BOLD,25));
         list.addListSelectionListener(e -> {
             currentNEO = (NearEarthObject) list.getSelectedValue();
-            displayFurtherData();
+                displayFurtherData();
         });
         JScrollPane listScroller = new JScrollPane(list);
         listScroller.setBackground(new Color(0x81AF67FE, true));
-        listScroller.setPreferredSize(new Dimension(800, getHeight()));
+        listScroller.setPreferredSize(new Dimension(770, getHeight()));
         TitledBorder border = new TitledBorder("Enter start and end dates to display NEOs below.");
         border.setTitleFont(defFont);
         border.setTitleJustification(TitledBorder.CENTER);
@@ -131,6 +156,7 @@ public class NEOFrame extends JFrame
         //neoInfo scroll pane
         neoInfo = new JTextArea();
         neoInfo.setEditable(false);
+        neoInfo.setLineWrap(true);
         JScrollPane neoInfoScroller = new JScrollPane(neoInfo);
         neoInfoScroller.setBackground(new Color(0x87941C9A, true));
         TitledBorder neoBorder = new TitledBorder("Detailed Description of Selected Near Earth Object");
@@ -138,8 +164,13 @@ public class NEOFrame extends JFrame
         neoBorder.setTitleJustification(TitledBorder.CENTER);
         neoInfoScroller.setBorder(neoBorder);
 
+        neoInfoPanel = new JPanel();
+        neoInfoPanel.setLayout(new BorderLayout());
+        neoInfoPanel.add(neoInfoScroller, BorderLayout.CENTER);
+        neoInfoPanel.add(diagramLinkButton, BorderLayout.SOUTH);
+
         //split pane
-        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, listScroller, neoInfoScroller);
+        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, listScroller, neoInfoPanel);
     }
 
     private void displayObjects()
@@ -154,24 +185,28 @@ public class NEOFrame extends JFrame
             }
         });
         list.setModel(listModel);
+
     }
 
     private void displayFurtherData()
     {
-                NearEarthObject.CloseApproachData cad = currentNEO.getClose_approach_data().get(0);
-                String closeApproachDate;
-                if (cad.getClose_approach_date_full() == null)
-                {
-                    closeApproachDate = cad.getClose_approach_date();
-                }
-        else {closeApproachDate =   cad.getClose_approach_date_full();}
+        NearEarthObject.CloseApproachData cad = currentNEO.getClose_approach_data().get(0);
+        String closeApproachDate;
+        if (cad.getClose_approach_date_full() == null)
+        {
+            closeApproachDate = cad.getClose_approach_date();
+        }
+        else
+        {
+            closeApproachDate = cad.getClose_approach_date_full();
+        }
         String velocity = cad.getRelative_velocity().getMiles_per_hour();
         String missDistance = cad.getMiss_distance().getMiles();
 
         neoInfo.setForeground(Color.BLACK);
         neoInfo.setFont(new Font("Arial",Font.PLAIN,30));
         neoInfo.setText("Name: " + currentNEO.getName() + "\n" +
-                "Reference Id: " + currentNEO.getId() + "\n" +
+                "Reference Id: " + currentNEO.getId() + "\n\n" +
                 "Estimated minimum diameter (feet): " + currentNEO.getEstimated_diameter().getFeet().getEstimated_diameter_min() + "\n" +
                 "Estimated maximum diameter (feet): " + currentNEO.getEstimated_diameter().getFeet().getEstimated_diameter_max() + "\n" +
                 "Date of close approach to Earth: " + closeApproachDate + "\n" +
@@ -179,11 +214,12 @@ public class NEOFrame extends JFrame
                 "Missing Earth by this many miles: " + missDistance
                 );
 
+
         if (currentNEO.isPotentiallyHazardous())
         {
             neoInfo.setFont(new Font("Arial",Font.BOLD,30));
             neoInfo.setForeground(Color.RED);
-            neoInfo.append("\nThis is a potentially hazardous asteroid. It is recommended that you avoid this area on this date.");
+            neoInfo.append("\n\nThis is a potentially hazardous asteroid. It is recommended that you avoid this area on this date.");
         }
     }
 
